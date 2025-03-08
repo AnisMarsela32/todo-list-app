@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animated-gradient {
+            background: linear-gradient(270deg, #000000, #ff69b4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+    </style>
+</head>
+<body class="animated-gradient flex items-center justify-center min-h-screen">
+    <div class="bg-black text-pink-200 p-6 rounded-lg shadow-lg w-full max-w-md border-4 border-pink-500">
+        <h1 class="text-3xl font-bold text-center mb-4">To Do List</h1>
+        <div class="flex mb-4">
+            <input type="text" class="flex-grow p-2 rounded-l-lg text-black" placeholder="Add a new task">
+            <button class="bg-pink-500 text-white p-2 rounded-r-lg">Add</button>
+        </div>
+        <h2 class="text-xl font-bold mb-2">Task List</h2>
+        <ul class="space-y-2">
+            <li class="flex items-center justify-between p-2 border border-pink-500 rounded-lg">
+                <div class="flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    <span>wash dishes</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-pink-500">Delete</button>
+                    <button class="text-pink-500">Edit</button>
+                </div>
+            </li>
+            <li class="flex items-center justify-between p-2 border border-pink-500 rounded-lg">
+                <div class="flex items-center">
+                    <input type="checkbox" class="mr-2" checked>
+                    <span class="line-through text-gray-500">edit resume</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-pink-500">Delete</button>
+                    <button class="text-pink-500">Edit</button>
+                </div>
+            </li>
+            <li class="flex items-center justify-between p-2 border border-pink-500 rounded-lg">
+                <div class="flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    <span>finish Codex course</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-pink-500">Delete</button>
+                    <button class="text-pink-500">Edit</button>
+                </div>
+            </li>
+        </ul>
+        <hr class="my-4 border-pink-500">
+        <div class="text-center">
+            <span>Completed: 1 | Uncompleted: 2</span>
+        </div>
+    </div>
+
+
+    <script>
+        // Menunggu hingga seluruh konten DOM dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mendapatkan elemen input, tombol tambah, daftar tugas, dan elemen untuk menampilkan jumlah tugas
+            const taskInput = document.querySelector('input[type="text"]');
+            const addButton = document.querySelector('button.bg-pink-500');
+            const taskList = document.querySelector('ul');
+            const completedCount = document.querySelector('.text-center span');
+    
+            // Array untuk menyimpan tugas
+            let tasks = [];
+    
+            // Fungsi untuk memperbarui jumlah tugas yang telah diselesaikan dan yang belum diselesaikan
+            function updateTaskCount() {
+                const completedTasks = tasks.filter(task => task.completed).length; // Menghitung tugas yang telah diselesaikan
+                const uncompletedTasks = tasks.length - completedTasks; // Menghitung tugas yang belum diselesaikan
+                completedCount.textContent = `Completed: ${completedTasks} | Uncompleted: ${uncompletedTasks}`; // Memperbarui tampilan jumlah tugas
+            }
+    
+            // Fungsi untuk menggambar ulang daftar tugas
+            function renderTasks() {
+                taskList.innerHTML = ''; // Menghapus konten lama dari daftar tugas
+                tasks.forEach((task, index) => {
+                    // Membuat elemen li untuk setiap tugas
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between p-2 border border-pink-500 rounded-lg';
+                    li.innerHTML = `
+                        <div class="flex items-center">
+                            <input type="checkbox" class="mr-2" ${task.completed ? 'checked' : ''}> <!-- Checkbox untuk menandai tugas -->
+                            <span class="${task.completed ? 'line-through text-gray-500' : ''}">${task.name}</span> <!-- Menampilkan nama tugas -->
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="text-pink-500" onclick="deleteTask(${index})">Delete</button> <!-- Tombol untuk menghapus tugas -->
+                            <button class="text-pink-500" onclick="editTask(${index})">Edit</button> <!-- Tombol untuk mengedit tugas -->
+                        </div>
+                    `;
+                    // Menambahkan event listener untuk checkbox
+                    li.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+                        task.completed = this.checked; // Mengubah status tugas berdasarkan checkbox
+                        updateTaskCount(); // Memperbarui jumlah tugas
+                        renderTasks(); // Menggambar ulang daftar tugas
+                    });
+                    taskList.appendChild(li); // Menambahkan elemen li ke daftar tugas
+                });
+                updateTaskCount(); // Memperbarui jumlah tugas setelah menggambar ulang
+            }
+    
+            // Fungsi untuk menghapus tugas berdasarkan indeks
+            window.deleteTask = function(index) {
+                tasks.splice(index, 1); // Menghapus tugas dari array
+                renderTasks(); // Menggambar ulang daftar tugas
+            };
+    
+            // Fungsi untuk mengedit tugas berdasarkan indeks
+            window.editTask = function(index) {
+                const newTaskName = prompt('Edit task name:', tasks[index].name); // Meminta input baru untuk nama tugas
+                if (newTaskName) {
+                    tasks[index].name = newTaskName; // Memperbarui nama tugas
+                    renderTasks(); // Menggambar ulang daftar tugas
+                }
+            };
+    
+            // Event listener untuk tombol tambah
+            addButton.addEventListener('click', function() {
+                const taskName = taskInput.value.trim(); // Mengambil nilai dari input dan menghapus spasi di awal/akhir
+                if (taskName) {
+                    tasks.push({ name: taskName, completed: false }); // Menambahkan tugas baru ke array
+                    taskInput.value = ''; // Mengosongkan input setelah menambahkan tugas
+                    renderTasks(); // Menggambar ulang daftar tugas
+                }
+            });
+        });
+    </script>
+</body>
+</html>
